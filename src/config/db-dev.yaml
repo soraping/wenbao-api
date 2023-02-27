@@ -1,0 +1,20 @@
+mysql:
+  host: "127.0.0.1"
+  port: 3306
+  user: "myadmin"
+  password: "myadmin123"
+  database: "myadmin"
+
+redis:
+  host: 172.21.3.207
+  port: 6379
+  db: 0
+  poolsize: 10
+  password:
+
+mongo:
+  host: 172.19.66.14
+  port: 27000
+  username:
+  password:
+  database: 'yx-d2c'
