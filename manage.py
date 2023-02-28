@@ -37,7 +37,8 @@ async def run():
     await create_table()
     await permissions()
     await role()
-    await admin()
+    admin_user_id = await admin()
+    await relation(admin_user_id)
     await mgr.close()
     log("安装完成", mode='done')
 
@@ -56,7 +57,7 @@ async def create_table():
 
 
 async def permissions():
-    log("初始化权限")
+    log("初始化权限表...")
     permissions = [
         {
             'label': '主控台',
@@ -116,14 +117,41 @@ async def admin():
     admin_data['password'] = gen_password(admin_data['password'], salt)
     admin_data['age'] = 10
     rprint(admin_data)
-    await mgr.execute(
+    user_id = await mgr.execute(
         UserModel.insert(**admin_data)
     )
     log("管理员账号创建完成！", mode='done')
+    return user_id
 
 
-async def relation():
-    log("")
+async def relation(admin_user_id):
+    log("初始角色权限关系表...")
+    # 角色
+    role_models = await mgr.execute(
+        RoleModel.select(RoleModel.type, RoleModel.id).where((RoleModel.type == RoleTypeEnum.ADMIN.value) | (RoleModel.type == RoleTypeEnum.EMPLOYEE.value))
+    )
+    roles = list(role_models)
+    admin_role = [role for role in roles if role.model_to_dict().type == RoleTypeEnum.ADMIN.value][0]
+    # 权限
+    permission_models = await mgr.execute(
+        PermissionModel.select(PermissionModel.id)
+    )
+    permissions = list(permission_models)
+
+
+    await mgr.execute(
+        RolePermissionModel.insert_many()
+    )
+
+    log("角色权限关系表初始化完成！", mode='done')
+
+    log("初始会员角色关系表...")
+    # 管理员的会员信息
+    await mgr.execute(
+        UserRoleModel.insert(user=admin_user_id, role=admin_role.id)
+    )
+    log("会员角色关系表初始化完成！", mode='done')
+
 
 if __name__ == '__main__':
     asyncio.run(run())
