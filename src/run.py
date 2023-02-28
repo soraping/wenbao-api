@@ -1,6 +1,5 @@
 from orjson import dumps
-from sanic import Sanic, Blueprint, HTTPResponse
-from sanic.response import json
+from sanic import Sanic
 from sanic.log import logger
 from sanic_ext import Extend
 
@@ -78,12 +77,7 @@ async def interceptor(request: Request):
 
 @bg_group.middleware('response')
 async def base_response(request: Request, response):
-    # 统一报文
-    return json({
-        'result': response,
-        'code': 200,
-        'message': ''
-    })
+    print(response)
 
 
 @app.after_server_start

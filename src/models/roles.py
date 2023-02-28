@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Time    : 2023/2/28 15:28
+# @Name    : user_role.py
+# @email   : 541251250@qq.com
+# @Author  : caoping
+
 from enum import Enum
 from peewee import (
     CharField,
@@ -10,9 +17,13 @@ class RoleTypeEnum(Enum):
     """
     角色类型
     """
-    USER = 'USER'
     # 管理员
     ADMIN = 'ADMIN'
+    # 员工
+    EMPLOYEE = 'EMPLOYEE'
+
+    # 普通用户
+    USER = 'USER'
     # 自定义
     CUSTOM = 'CUSTOM'
 

@@ -1,6 +1,7 @@
 from sanic import Sanic, exceptions, Request
 from sanic.log import logger
 from sanic.response import json
+from .constant import ResponseTypeEnum
 
 
 class ConfigurationConflictError(exceptions.SanicException):
@@ -53,7 +54,6 @@ class UserClientError(exceptions.SanicException):
     status_code = 401
 
 
-
 class InitErrorHandler:
 
     def __init__(self, code):
@@ -70,4 +70,4 @@ class InitErrorHandler:
 
     def __call__(self, request: Request, error: exceptions.SanicException):
         logger.error(str(error))
-        return json({'message': str(error), 'code': self.code})
+        return json({'message': str(error), 'code': self.code, "type": ResponseTypeEnum.ERROR.value})

@@ -1,9 +1,12 @@
+from typing import Dict, AnyStr
 import orjson
-from functools import wraps
+from functools import wraps, singledispatch
+from sanic import HTTPResponse
 from sanic.log import logger
 from src.config.context import Request
 
 
+@singledispatch
 def json_prettify(data):
     """
     json 美化输出
@@ -11,7 +14,18 @@ def json_prettify(data):
     :param data:
     :return:
     """
+    return repr(data)
+
+
+@json_prettify.register(dict)
+def _(data):
     return orjson.dumps(data, option=orjson.OPT_INDENT_2).decode('utf-8')
+
+
+@json_prettify.register(bytes)
+def _(data):
+    res = orjson.loads(data)
+    return orjson.dumps(res, option=orjson.OPT_INDENT_2).decode('utf-8')
 
 
 def request_log(func):
@@ -40,8 +54,9 @@ def request_log(func):
         # json.dumps(request_data, indent=4) 美化输出
         logger.info(f"\nrequest_id={request_id}\nrequest_log={json_prettify(log_data)}")
         func_data = await func(request, *args, **kwargs)
-        logger.info(f"\nrequest_id={request_id}\nresponse_log={repr(func_data)}")
+        # 做个返回值保护
+        result_data = func_data.body if isinstance(func_data, HTTPResponse) else func_data
+        logger.info(f"\nrequest_id={request_id}\nresponse_log={json_prettify(result_data)}")
         return func_data
 
     return decorator
-
