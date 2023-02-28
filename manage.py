@@ -5,7 +5,14 @@ from rich import print as rprint
 from src.config import CONFIG
 from src.extension import InitMysql
 from migrations import MigratorOperate
-from src.models import RoleTypeEnum, RoleModel, UserModel
+from src.models import (
+    PermissionModel,
+    RolePermissionModel,
+    RoleTypeEnum,
+    RoleModel,
+    UserModel,
+    UserRoleModel
+)
 from src.utils import gen_random, gen_password, auto_load_gen
 
 config_data = CONFIG.get_config()
@@ -28,8 +35,9 @@ def log(msg, mode='info'):
 async def run():
     log("开始安装...", mode='start')
     await create_table()
-    # await role()
-    # await admin()
+    await permissions()
+    await role()
+    await admin()
     await mgr.close()
     log("安装完成", mode='done')
 
@@ -47,12 +55,47 @@ async def create_table():
     log("数据表创建完成!", mode='done')
 
 
+async def permissions():
+    log("初始化权限")
+    permissions = [
+        {
+            'label': '主控台',
+            'value': 'dashboard_console',
+        },
+        {
+            'label': '监控页',
+            'value': 'dashboard_monitor',
+        },
+        {
+            'label': '工作台',
+            'value': 'dashboard_workplace',
+        },
+        {
+            'label': '基础列表',
+            'value': 'basic_list',
+        },
+        {
+            'label': '基础列表删除',
+            'value': 'basic_list_delete',
+        },
+    ]
+
+    await mgr.execute(
+        PermissionModel.insert_many(permissions)
+    )
+    log("系统默认权限设置完成!", mode='done')
+
+
 async def role():
     log("初始化系统默认角色...")
     role_list = [
         {
             "name": "管理员",
             "type": RoleTypeEnum.ADMIN.value
+        },
+        {
+            "name": "员工",
+            "type": RoleTypeEnum.EMPLOYEE.value
         },
         {
             "name": "用户",
@@ -71,10 +114,6 @@ async def admin():
     salt = gen_random(length=12)
     admin_data['salt'] = salt
     admin_data['password'] = gen_password(admin_data['password'], salt)
-    admin_role_gen = await mgr.execute(
-        RoleModel.select().where((RoleModel.type == RoleTypeEnum.ADMIN.value))
-    )
-    admin_data['role'] = admin_role_gen[0]['id']
     admin_data['age'] = 10
     rprint(admin_data)
     await mgr.execute(
@@ -82,6 +121,9 @@ async def admin():
     )
     log("管理员账号创建完成！", mode='done')
 
+
+async def relation():
+    log("")
 
 if __name__ == '__main__':
     asyncio.run(run())

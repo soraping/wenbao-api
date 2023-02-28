@@ -12,7 +12,7 @@ from peewee import (
 from .base import BaseModel
 
 
-class Permissions(BaseModel):
+class PermissionModel(BaseModel):
     """
     权限表
     """

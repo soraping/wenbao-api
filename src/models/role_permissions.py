@@ -11,16 +11,16 @@ from peewee import (
 )
 from .roles import RoleModel
 from .base import BaseModel
-from .permissions import Permissions
+from .permissions import PermissionModel
 
 
-class RolePermissions(BaseModel):
+class RolePermissionModel(BaseModel):
     """
     角色权限关系表
     """
     id = PrimaryKeyField()
     role = ForeignKeyField(model=RoleModel, null=True, on_delete='SET NULL', verbose_name='role id')
-    permission = ForeignKeyField(model=Permissions, null=True, on_delete='SET NULL', verbose_name='permission id')
+    permission = ForeignKeyField(model=PermissionModel, null=True, on_delete='SET NULL', verbose_name='permission id')
 
     class Meta:
         table_name = 'role_permissions'
