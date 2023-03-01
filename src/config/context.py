@@ -1,12 +1,37 @@
+from typing import List
 from dataclasses import dataclass
 from peewee_async import Manager
 from sanic import Request as SanicRequest
 
 
-@dataclass
+# @dataclass
+# class AuthUser:
+#     role: str
+#     user_id: str
+
+
+class Roles:
+    role_id: int
+    role_name: str
+    role_type: str
+
+
+class Permissions:
+    label: str
+    value: str
+
+
 class AuthUser:
-    role: str
     user_id: str
+    user_id: int
+    token: str
+    username: str
+    age: int
+    avatar: str
+    mobile: str
+    status: int
+    roles: List[Roles]
+    permissions: List[Permissions]
 
 
 class MyContent:

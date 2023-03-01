@@ -13,7 +13,7 @@ import typing
 from rich.console import Console
 from rich import print as rprint
 from src.config import CONFIG
-from src.extension import InitMysql
+from src.extension.db import InitMysql
 from migrations import MigratorOperate
 from src.models import (
     PermissionModel,

@@ -6,7 +6,8 @@ from functools import wraps
 from sanic import Sanic
 import jwt
 from src.utils import custom_exceptions
-from src.config.context import Request, AuthUser
+from src.config.context import Request
+from src.services import users_service
 
 
 @dataclass
@@ -61,7 +62,7 @@ class JwtExt:
                 cls.config.secret_key,
                 algorithms=[cls.config.algorithm]
             )
-            return AuthUser(**jwt_data['data'])
+            return jwt_data['data']
         except jwt.exceptions.DecodeError:
             raise custom_exceptions.JWTTokenDecodeError
 
@@ -73,10 +74,17 @@ class JwtExt:
                 auth_token = request.headers.get('Authorization')
                 if not auth_token:
                     raise custom_exceptions.NoAuthorizationError
-                if not cls.check_token(auth_token):
-                    raise custom_exceptions.InvalidJWTTokenError
+
+                # 解析
                 resolve_token_data = cls.resolve_token(auth_token)
-                request.ctx.auth_user = resolve_token_data
+                if not resolve_token_data:
+                    raise custom_exceptions.InvalidJWTTokenError
+
+                # todo 设置redis 缓存保存用户信息
+                user_id = resolve_token_data['user_id']
+                cache_key = f"USER_KEY_ID_{user_id}"
+                auth_user_info = await users_service.query_user_by_id(request, user_id)
+                request.ctx.auth_user = auth_user_info
                 response = await func(request, *args, **kwargs)
                 return response
 

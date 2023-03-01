@@ -7,7 +7,7 @@ from peewee import (
 from playhouse.shortcuts import model_to_dict
 
 from src.config import CONFIG
-from src.extension import InitMysql
+from src.extension.db import InitMysql
 
 ModelDictType = Dict[str, Union[datetime.datetime, int, str]]
 

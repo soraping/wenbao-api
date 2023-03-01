@@ -4,14 +4,13 @@ from src.models import (
     UserModel,
     RoleModel,
     UserRoleModel,
-    RolePermissionModel,
-    ModelDictType
+    RolePermissionModel
 )
 from src.config.context import Request
 from src.utils import exceptions, gen_password
 
 
-async def query_user_by_login(request: Request, data) -> ModelDictType:
+async def query_user_by_login(request: Request, data):
     """
     登录信息查询
     :param request:
@@ -37,7 +36,7 @@ async def query_user_by_login(request: Request, data) -> ModelDictType:
         raise exceptions.UserClientError(message="用户名或密码错误")
 
 
-async def query_user_by_id(request: Request, user_id: str) -> ModelDictType:
+async def query_user_by_id(request: Request, user_id: str):
     """
     根据Id查询用户信息
     :param request:
@@ -107,6 +106,7 @@ async def query_user_roles_by_user_id(request: Request, user_id):
             'role_name': user_role.role.name
         }
         for user_role in user_roles
+        if user_role.role is not None
     ]
 
 
@@ -132,4 +132,14 @@ async def query_user_permissions_by_role(request: Request, role_ids):
             "value": permission.permission.value
         }
         for permission in role_permissions
+        if permission.permission is not None
     ]
+
+
+async def query_user_role_list(request: Request):
+    """
+    查询角色列表
+    :param request:
+    :return:
+    """
+    ...

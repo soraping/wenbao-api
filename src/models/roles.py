@@ -33,6 +33,8 @@ class RoleModel(BaseModel):
     id = PrimaryKeyField()
     name = CharField(max_length=20, verbose_name='role name')
     type = CharField(max_length=20, verbose_name='role type')
+    desc = CharField(max_length=200, null=True, verbose_name='role desc')
+    is_default = IntegerField(choices=((0, '不是'), (1, '是')), verbose_name='is default role', default=0)
     status = IntegerField(choices=((0, '删除'), (1, '正常')), verbose_name='role status', default=1)
 
     class Meta:

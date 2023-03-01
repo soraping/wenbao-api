@@ -6,7 +6,8 @@ from sanic_ext import Extend
 from src.config import CONFIG
 from src.config.context import MyContent, Request
 from src.utils import custom_exceptions
-from src.extension import JwtExt, InitMysql
+from src.extension.jwt_ext import JwtExt
+from src.extension.db import InitMysql
 from src.views import bg_group
 
 # 配置信息
