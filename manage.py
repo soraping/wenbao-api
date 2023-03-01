@@ -1,5 +1,15 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Time    : 2023/2/28 15:28
+# @Name    : manage.py
+# @email   : 541251250@qq.com
+# @Author  : caoping
+
+import click
+import inquirer
 import asyncio
 import peewee
+import typing
 from rich.console import Console
 from rich import print as rprint
 from src.config import CONFIG
@@ -38,6 +48,7 @@ async def run():
     await permissions()
     await role()
     admin_user_id = await admin()
+    log(f"管理员账号 => {admin_user_id}")
     await relation(admin_user_id)
     await mgr.close()
     log("安装完成", mode='done')
@@ -49,7 +60,7 @@ async def create_table():
     models = auto_load_gen('src.models.__init__')
     for model in models:
         # 通过子类判断更加合理
-        if issubclass(model, peewee.Model):
+        if type(model) != typing._GenericAlias and issubclass(model, peewee.Model):
             MigratorOperate(model)
             log(f"生成表 {model._meta.table_name}")
 
@@ -131,16 +142,26 @@ async def relation(admin_user_id):
         RoleModel.select(RoleModel.type, RoleModel.id).where((RoleModel.type == RoleTypeEnum.ADMIN.value) | (RoleModel.type == RoleTypeEnum.EMPLOYEE.value))
     )
     roles = list(role_models)
-    admin_role = [role for role in roles if role.model_to_dict().type == RoleTypeEnum.ADMIN.value][0]
+    # 管理员账号信息
+    admin_role = [role for role in roles if role.model_to_dict()['type'] == RoleTypeEnum.ADMIN.value][0]
     # 权限
     permission_models = await mgr.execute(
-        PermissionModel.select(PermissionModel.id)
+        PermissionModel.select(PermissionModel.id, PermissionModel.value)
     )
     permissions = list(permission_models)
 
+    # 角色权限分配
+    permission_list = [
+        {
+            "role": role.id,
+            "permission": permission.id
+        }
+        for role in roles
+        for permission in permissions
+    ]
 
     await mgr.execute(
-        RolePermissionModel.insert_many()
+        RolePermissionModel.insert_many(permission_list)
     )
 
     log("角色权限关系表初始化完成！", mode='done')

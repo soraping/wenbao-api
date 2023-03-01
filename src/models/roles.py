@@ -8,7 +8,8 @@
 from enum import Enum
 from peewee import (
     CharField,
-    PrimaryKeyField
+    PrimaryKeyField,
+    IntegerField
 )
 from src.models.base import BaseModel
 
@@ -32,6 +33,7 @@ class RoleModel(BaseModel):
     id = PrimaryKeyField()
     name = CharField(max_length=20, verbose_name='role name')
     type = CharField(max_length=20, verbose_name='role type')
+    status = IntegerField(choices=((0, '删除'), (1, '正常')), verbose_name='role status', default=1)
 
     class Meta:
         table_name = 'roles'

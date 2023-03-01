@@ -14,8 +14,8 @@ user_bp = Blueprint('user', url_prefix='/user')
 async def user_login(request: Request):
     body = request.json
     user_data = await user_service.query_user_by_login(request, body)
-    role = user_data['role']
-    token = JwtExt.create_access_token(user_data['id'], {'role': role['type'], 'user_id': user_data['id']})
+    roles = user_data['roles']
+    token = JwtExt.create_access_token(user_data['id'], {'role': roles[0]['role_type'], 'user_id': user_data['id']})
     user_data['token'] = token
     return user_data
 

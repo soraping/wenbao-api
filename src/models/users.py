@@ -24,6 +24,7 @@ class UserModel(BaseModel):
     age = IntegerField(null=True, verbose_name='user age')
     avatar = CharField(null=True, max_length=100, verbose_name='user avatar')
     mobile = CharField(null=True, unique=True, max_length=20, verbose_name='user mobile')
+    status = IntegerField(choices=((0, '删除'), (1, '正常'), (2, '锁定')), verbose_name='user status', default=1)
 
     class Meta:
         table_name = 'user'

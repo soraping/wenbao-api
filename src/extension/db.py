@@ -1,6 +1,5 @@
 from peewee_async import PooledMySQLDatabase, MySQLDatabase, Manager
 from playhouse.shortcuts import ReconnectMixin
-from src.utils import custom_exceptions
 
 
 class InitMysql:

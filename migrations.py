@@ -148,5 +148,5 @@ class MigratorOperate:
 
 if __name__ == '__main__':
     from src.models import RoleModel, UserModel
-    mr = MigratorOperate(RoleModel)
-    # mr.add_table_column('desc')
+    # mr = MigratorOperate(UserModel)
+    # mr.add_table_column('status')

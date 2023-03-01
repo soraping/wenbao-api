@@ -14,11 +14,10 @@ from .role_permissions import RolePermissionModel
 
 
 __all__ = [
-    'ModelDictType',
-    'RoleTypeEnum',
     'UserModel',
     'PermissionModel',
     'RolePermissionModel',
     'RoleModel',
-    'UserRoleModel'
+    'UserRoleModel',
+    'RoleTypeEnum'
 ]
