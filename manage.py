@@ -111,7 +111,8 @@ async def role():
         },
         {
             "name": "用户",
-            "type": RoleTypeEnum.USER.value
+            "type": RoleTypeEnum.USER.value,
+            "is_default": 1
         }
     ]
     await mgr.execute(
