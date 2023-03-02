@@ -6,8 +6,7 @@
 # @Author  : caoping
 
 from peewee import (
-    CharField,
-    PrimaryKeyField
+    CharField
 )
 from .base import BaseModel
 
@@ -16,7 +15,6 @@ class PermissionModel(BaseModel):
     """
     权限表
     """
-    id = PrimaryKeyField()
     label = CharField(max_length=20, verbose_name='permission name')
     value = CharField(max_length=20, verbose_name='permission value')
 

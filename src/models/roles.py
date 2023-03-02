@@ -8,7 +8,6 @@
 from enum import Enum
 from peewee import (
     CharField,
-    PrimaryKeyField,
     IntegerField
 )
 from src.models.base import BaseModel
@@ -30,7 +29,6 @@ class RoleTypeEnum(Enum):
 
 
 class RoleModel(BaseModel):
-    id = PrimaryKeyField()
     name = CharField(max_length=20, verbose_name='role name')
     type = CharField(max_length=20, verbose_name='role type')
     desc = CharField(max_length=200, null=True, verbose_name='role desc')

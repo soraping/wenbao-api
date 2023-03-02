@@ -6,7 +6,6 @@
 # @Author  : caoping
 
 from peewee import (
-    PrimaryKeyField,
     ForeignKeyField
 )
 from .users import UserModel
@@ -18,7 +17,6 @@ class UserRoleModel(BaseModel):
     """
     用户角色关系表，多对多
     """
-    id = PrimaryKeyField()
     user = ForeignKeyField(model=UserModel, null=True, on_delete='SET NULL', verbose_name='user id')
     role = ForeignKeyField(model=RoleModel, null=True, on_delete='SET NULL', verbose_name='role id')
 

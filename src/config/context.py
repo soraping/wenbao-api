@@ -9,6 +9,8 @@ from sanic import Request as SanicRequest
 #     role: str
 #     user_id: str
 
+class Session:
+    ...
 
 class Roles:
     role_id: int
@@ -40,6 +42,8 @@ class MyContent:
     """
     # jwt 会话
     auth_user: AuthUser
+    # session
+    session: Session
     # db
     db: Manager
     # redis

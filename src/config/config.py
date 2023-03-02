@@ -25,6 +25,9 @@ class Config:
     # 跨域
     CORS_ORIGINS = "*"
 
+    # 表单提交不需要加密
+    WTF_CSRF_ENABLED = False
+
     # jwt
     JWT = {
         "secret_key": "wenbao",

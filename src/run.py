@@ -2,12 +2,14 @@ from orjson import dumps
 from sanic import Sanic
 from sanic.log import logger
 from sanic_ext import Extend
+import wtforms_json
 
 from src.config import CONFIG
 from src.config.context import MyContent, Request
 from src.utils import custom_exceptions
 from src.extension.jwt_ext import JwtExt
 from src.extension.db import InitMysql
+from src.extension.aio_redis import RedisSession
 from src.views import bg_group
 
 # 配置信息
@@ -27,58 +29,16 @@ Extend(app)
 # 注册路由
 app.blueprint(bg_group)
 
-
-# def register_blueprints(api_module: str, app: Sanic) -> None:
-#     """
-#     自动加载bp
-#     :param api_module:
-#     :param app:
-#     :return:
-#     """
-#     modules = auto_load_gen(api_module)
-#     for module in modules:
-#         if isinstance(module, Blueprint):
-#             app.blueprint(module)
-#
-#
-# register_blueprints('views.__init__', app)
-
-
-# @app.middleware("request")
-# def cors_middle_req(request: Request):
-#     """路由需要启用OPTIONS方法"""
-#     if request.method.lower() == 'options':
-#         allow_headers = [
-#             'Authorization',
-#             'content-type'
-#         ]
-#         headers = {
-#             'Access-Control-Allow-Methods':
-#                 ', '.join(request.app.router.ALLOWED_METHODS),
-#             'Access-Control-Max-Age': '86400',
-#             'Access-Control-Allow-Headers': ', '.join(allow_headers),
-#         }
-#         return HTTPResponse('', headers=headers)
-#
-#
-# @app.middleware("response")
-# def cors_middle_res(request: Request, response: HTTPResponse):
-#     """跨域处理"""
-#     response.headers.update(
-#         {
-#             'Access-Control-Allow-Origin': app.config['CORS_ORIGINS'],
-#         }
-#     )
+# 表单提交校验支持json
+wtforms_json.init()
 
 
 @bg_group.middleware('request')
 async def interceptor(request: Request):
-    request.ctx = app.ctx
-
-
-@bg_group.middleware('response')
-async def base_response(request: Request, response):
-    print(response)
+    request.ctx = request.app.ctx
+    # forms 模块使用 session 对象
+    # 使用了jwt，没有必要再用引入 sanic-session
+    request.ctx.session = {}
 
 
 @app.after_server_start

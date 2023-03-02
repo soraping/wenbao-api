@@ -4,7 +4,8 @@ from src.models import (
     UserModel,
     RoleModel,
     UserRoleModel,
-    RolePermissionModel
+    RolePermissionModel,
+    MenuModel
 )
 from src.config.context import Request
 from src.utils import exceptions, gen_password
@@ -134,6 +135,41 @@ async def query_user_permissions_by_role(request: Request, role_ids):
         for permission in role_permissions
         if permission.permission is not None
     ]
+
+
+async def add_menu(request: Request, data):
+    """
+    新增菜单
+    :param request:
+    :param data:
+    :return:
+    """
+    await request.ctx.db.execute(
+        MenuModel.insert(**data)
+    )
+
+
+async def query_menu_list(request: Request):
+    """
+    获取菜单所有列表
+    :param request:
+    :return:
+    """
+    menu_list = await request.ctx.db.execute(
+        MenuModel.select()
+    )
+
+    print(menu_list)
+
+
+async def query_user_menu_list(request: Request):
+    """
+    查询该用户权限下列表
+    :param request:
+    :return:
+    """
+    auth_user = request.ctx.auth_user
+
 
 
 async def query_user_role_list(request: Request):

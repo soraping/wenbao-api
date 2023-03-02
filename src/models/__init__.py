@@ -9,6 +9,7 @@ from .users import UserModel
 from .user_roles import UserRoleModel
 from .permissions import PermissionModel
 from .role_permissions import RolePermissionModel
+from .menu import MenuModel
 
 
 __all__ = [
@@ -17,5 +18,6 @@ __all__ = [
     'RolePermissionModel',
     'RoleModel',
     'UserRoleModel',
+    'MenuModel',
     'RoleTypeEnum'
 ]

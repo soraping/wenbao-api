@@ -1,7 +1,7 @@
 from functools import wraps
 from sanic import Request
 from sanic.response import json
-from .constant import ResponseTypeEnum
+from src.constant import ResponseTypeEnum
 
 
 def singleton(cls):

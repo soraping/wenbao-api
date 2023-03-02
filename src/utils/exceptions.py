@@ -1,7 +1,7 @@
 from sanic import Sanic, exceptions, Request
 from sanic.log import logger
 from sanic.response import json
-from .constant import ResponseTypeEnum
+from src.constant import ResponseTypeEnum
 
 
 class ConfigurationConflictError(exceptions.SanicException):

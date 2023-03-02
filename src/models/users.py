@@ -8,7 +8,6 @@
 from src.models.base import BaseModel
 from peewee import (
     IntegerField,
-    PrimaryKeyField,
     CharField
 )
 
@@ -17,7 +16,6 @@ class UserModel(BaseModel):
     """
     用户信息表
     """
-    id = PrimaryKeyField()
     username = CharField(unique=True, max_length=20, verbose_name='username')
     password = CharField(max_length=50, verbose_name='user password')
     salt = CharField(max_length=16, verbose_name='password salt')
