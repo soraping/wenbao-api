@@ -11,6 +11,10 @@ from wtforms import (
     SelectMultipleField, StringField, SubmitField, TextAreaField
 )
 from wtforms.validators import DataRequired
+import wtforms_json
+
+# 表单提交校验支持json
+wtforms_json.init()
 
 
 class SanicForm(_SanicForm):

@@ -2,7 +2,6 @@ from orjson import dumps
 from sanic import Sanic
 from sanic.log import logger
 from sanic_ext import Extend
-import wtforms_json
 
 from src.config import CONFIG
 from src.config.context import MyContent, Request
@@ -28,9 +27,6 @@ Extend(app)
 
 # 注册路由
 app.blueprint(bg_group)
-
-# 表单提交校验支持json
-wtforms_json.init()
 
 
 @bg_group.middleware('request')
