@@ -22,7 +22,10 @@ wtforms_json.init()
 class SanicForm(_SanicForm):
     # 新增这个类属性
     # 1. 为了idea能识别提示 2. 可以多一个引用
-    from_json = wtforms_json.from_json
+    @classmethod
+    def from_json(cls, formdata: Dict=None) -> _SanicForm:
+        # 子类调用父类的classmethod,一定要用super来改变cls的指向，不要直接调用
+        return super(SanicForm, cls).from_json(formdata=formdata)
 
 
 class UserForm(SanicForm):
