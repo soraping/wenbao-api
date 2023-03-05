@@ -17,8 +17,8 @@ async def user_login(request: Request):
     :param request:
     :return:
     """
-    user_login_form = UserForm.from_json(request.json)
-    body = request.json
+    user_login_form = UserForm.from_json(formdata=request.json)
+    body = user_login_form.data
     user_data = await users_service.query_user_by_login(request, body)
     token = JwtExt.create_access_token(user_data['id'], {'user_id': user_data['id']})
     user_data['token'] = token

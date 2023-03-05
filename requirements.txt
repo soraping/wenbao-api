@@ -7,8 +7,9 @@ peewee==3.15.4
 peewee_async==0.8.0
 PyJWT==2.6.0
 PyYAML==6.0
-rich==13.3.1
+rich==13.3.2
 sanic==22.9.1
 sanic_ext==22.12.0
 Sanic_WTF==0.6.0
 WTForms==3.0.1
+WTForms_JSON==0.3.5
