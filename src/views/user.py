@@ -3,7 +3,7 @@ from src.extension.jwt_ext import JwtExt
 from src.services import users_service
 from src.utils import request_log, ResponseBody
 from src.config.context import Request
-from src.forms import UserForm
+from src.forms import UserForm, MenuForm
 
 admin_user_bp = Blueprint('admin-user', url_prefix='/admin/user')
 user_bp = Blueprint('user', url_prefix='/user')
@@ -51,17 +51,30 @@ async def admin_role_list(request: Request):
     return await users_service.query_user_role_list(request)
 
 
-@admin_user_bp.get('/menu/list')
+@admin_user_bp.get('/owner/menu/list')
 @JwtExt.login_required()
 @request_log
 @ResponseBody()
-async def admin_menu_list(request: Request):
+async def user_menu_list(request: Request):
+    """
+    获取用户分配的菜单
+    :param request:
+    :return:
+    """
+    return await users_service.query_user_menu_list(request)
+
+
+@admin_user_bp.get('/all/menu/list')
+@JwtExt.login_required()
+@request_log
+@ResponseBody()
+async def admin_all_menu_list(request: Request):
     """
     获取所有菜单列表
     :param request:
     :return:
     """
-    return await users_service.query_menu_list(request)
+    return await users_service.query_all_menu_list(request)
 
 
 @admin_user_bp.post('/menu/add')
@@ -74,5 +87,5 @@ async def admin_menu_add(request: Request):
     :param request:
     :return:
     """
-    body = request.json
-    await users_service.add_menu(request, body)
+    menu_form = MenuForm.from_json(request.json)
+    await users_service.add_menu(request, menu_form.data)

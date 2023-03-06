@@ -147,6 +147,6 @@ class MigratorOperate:
 
 
 if __name__ == '__main__':
-    from src.models import RoleModel
-    # mr = MigratorOperate(RoleModel)
-    # mr.add_table_column('desc')
+    from src.models import MenuModel
+    # mr = MigratorOperate(MenuModel)
+    # mr.add_table_column('sort')

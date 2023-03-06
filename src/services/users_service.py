@@ -53,13 +53,13 @@ async def query_user_by_id(request: Request, user_id: str):
             ).where((UserModel.id == user_id))
         )
 
-        user_result_dict = user_data.model_to_dict()
-        roles, permissions = await query_user_roles_and_permissions(request, user_result_dict.get('id'))
-        user_result_dict['roles'] = roles
+        auth_user_result_dict = user_data.model_to_dict()
+        roles, permissions = await query_user_roles_and_permissions(request, auth_user_result_dict.get('id'))
+        auth_user_result_dict['roles'] = roles
         # 获取权限
-        user_result_dict['permissions'] = permissions
+        auth_user_result_dict['permissions'] = permissions
 
-        return user_result_dict
+        return auth_user_result_dict
 
     except (DoesNotExist, exceptions.UserClientError) as e:
         raise exceptions.UserClientError(message="用户名或密码错误")
@@ -149,17 +149,20 @@ async def add_menu(request: Request, data):
     )
 
 
-async def query_menu_list(request: Request):
+async def query_all_menu_list(request: Request):
     """
     获取菜单所有列表
     :param request:
     :return:
     """
-    menu_list = await request.ctx.db.execute(
-        MenuModel.select()
+    menu_list: List[MenuModel] = await request.ctx.db.execute(
+        MenuModel.select().where(MenuModel.status == 1)
     )
 
-    print(menu_list)
+    return [
+        menu_model.model_to_dict(exclude=[MenuModel.create_time, MenuModel.update_time])
+        for menu_model in menu_list
+    ]
 
 
 async def query_user_menu_list(request: Request):
@@ -169,6 +172,10 @@ async def query_user_menu_list(request: Request):
     :return:
     """
     auth_user = request.ctx.auth_user
+    user_permissions = [permission['value'] for permission in auth_user['permissions']]
+    all_menu_list = await query_all_menu_list(request)
+    # 根据权限筛选菜单
+    return [menu for menu in all_menu_list if menu.get('permission') in user_permissions]
 
 
 

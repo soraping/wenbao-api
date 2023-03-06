@@ -12,6 +12,7 @@ from sanic import Request as SanicRequest
 class Session:
     ...
 
+
 class Roles:
     role_id: int
     role_name: str
