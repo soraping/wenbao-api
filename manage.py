@@ -21,7 +21,8 @@ from src.models import (
     RoleTypeEnum,
     RoleModel,
     UserModel,
-    UserRoleModel
+    UserRoleModel,
+    MenuModel
 )
 from src.utils import gen_random, gen_password, auto_load_gen
 
@@ -43,13 +44,14 @@ def log(msg, mode='info'):
 
 
 async def run():
-    log("开始安装...", mode='start')
-    await create_table()
-    await permissions()
-    await role()
-    admin_user_id = await admin()
-    log(f"管理员账号 => {admin_user_id}")
-    await relation(admin_user_id)
+    # log("开始安装...", mode='start')
+    # await create_table()
+    # await permissions()
+    # await role()
+    # admin_user_id = await admin()
+    # log(f"管理员账号 => {admin_user_id}")
+    # await relation(admin_user_id)
+    await init_menu()
     await mgr.close()
     log("安装完成", mode='done')
 
@@ -173,6 +175,56 @@ async def relation(admin_user_id):
         UserRoleModel.insert(user=admin_user_id, role=admin_role.id)
     )
     log("会员角色关系表初始化完成！", mode='done')
+
+
+async def init_menu():
+    log("系统菜单初始化开始...")
+    menu_list = [
+        {
+            "id": 1,
+            "name": "控制面板",
+            "key": "dashboard",
+            "parent": None,
+            "component": "LAYOUT",
+            "path": "dashboard",
+            "permission": "dashboard_workplace",
+            "type": 1
+        },
+        {
+            "id": 2,
+            "name": "系统设置",
+            "key": "system",
+            "parent": None,
+            "component": "LAYOUT",
+            "path": "system",
+            "permission": "dashboard_workplace",
+            "type": 1
+        },
+        {
+            "id": 3,
+            "name": "主控台",
+            "key": "dashboard_console",
+            "parent": 1,
+            "component": "/dashboard/console/console",
+            "path": "console",
+            "permission": "dashboard_workplace",
+            "type": 1
+        },
+        {
+            "id": 4,
+            "name": "菜单权限",
+            "key": "system_menu",
+            "parent": 2,
+            "component": "/system/menu/menu",
+            "path": "menu",
+            "permission": "dashboard_workplace",
+            "type": 1
+        }
+    ]
+    await mgr.execute(
+        MenuModel.insert_many(menu_list)
+    )
+    log("系统菜单初始化完成！", mode='done')
 
 
 if __name__ == '__main__':

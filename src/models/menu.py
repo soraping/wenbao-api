@@ -20,13 +20,12 @@ class MenuModel(BaseModel):
     parent = IntegerField(verbose_name='menu parent menu', null=True)
     # 菜单名称/按钮名称
     name = CharField(max_length=20, verbose_name='menu title')
+    key = CharField(null=True, max_length=20, verbose_name='menu key')
     # 图标
     icon = CharField(null=True, max_length=64, verbose_name="菜单图标", help_text="菜单图标")
     # 状态
     status = IntegerField(choices=((0, '删除'), (1, '正常')), verbose_name='menu status', default=1)
     type = IntegerField(null=True, choices=((0, "目录/一级菜单"), (1, "菜单/具体页面"), (2, "按钮")), verbose_name="是否目录", default=1)
-
-    key = CharField(null=True, max_length=20, verbose_name='menu key')
     # 权限标示 PermissionModel
     permission = CharField(max_length=20, verbose_name='menu auth')
     # 路由路径

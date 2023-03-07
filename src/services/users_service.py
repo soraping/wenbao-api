@@ -175,8 +175,8 @@ async def query_user_menu_list(request: Request):
     user_permissions = [permission['value'] for permission in auth_user['permissions']]
     all_menu_list = await query_all_menu_list(request)
     # 根据权限筛选菜单
-    return [menu for menu in all_menu_list if menu.get('permission') in user_permissions]
-
+    return [menu for menu in all_menu_list if
+            menu.get('permission') in user_permissions or menu.get('permission') is None]
 
 
 async def query_user_role_list(request: Request):
