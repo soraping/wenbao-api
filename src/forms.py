@@ -42,6 +42,7 @@ class MenuForm(SanicForm):
     redirect = StringField('redirect')
     permission = StringField('permission')
     parent = IntegerField('parent')
+    key = StringField('key')
 
 
 if __name__ == '__main__':
