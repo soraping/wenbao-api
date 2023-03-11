@@ -49,7 +49,7 @@ def request_log(func):
             log_data['data'] = request.json
 
         if login_user:
-            log_data['login_user'] = login_user
+            log_data['login_user'] = login_user.to_dict()
 
         # json.dumps(request_data, indent=4) 美化输出
         logger.info(f"\nrequest_id={request_id}\nrequest_log={json_prettify(log_data)}")

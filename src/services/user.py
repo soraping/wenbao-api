@@ -48,7 +48,8 @@ async def query_user_by_id(request: Request, user_id: str):
             UserModel.select(
                 UserModel.username,
                 UserModel.id,
-                UserModel.age
+                UserModel.age,
+                UserModel.status
             ).where((UserModel.id == user_id))
         )
 

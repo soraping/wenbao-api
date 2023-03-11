@@ -34,6 +34,7 @@ class UserForm(SanicForm):
 
 
 class MenuForm(SanicForm):
+    id = IntegerField('id')
     name = StringField('name', validators=[DataRequired()])
     icon = StringField('icon')
     type = StringField('type')

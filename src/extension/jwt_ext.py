@@ -6,7 +6,7 @@ from functools import wraps
 from sanic import Sanic
 import jwt
 from src.utils import custom_exceptions
-from src.config.context import Request
+from src.config.context import Request, AuthUser
 from src.services import user
 
 
@@ -84,7 +84,7 @@ class JwtExt:
                 user_id = resolve_token_data['user_id']
                 cache_key = f"USER_KEY_ID_{user_id}"
                 auth_user_info = await user.query_user_by_id(request, user_id)
-                request.ctx.auth_user = auth_user_info
+                request.ctx.auth_user = AuthUser.get_user(auth_user_info)
                 response = await func(request, *args, **kwargs)
                 return response
 

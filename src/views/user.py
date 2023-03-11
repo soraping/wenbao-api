@@ -38,7 +38,7 @@ async def admin_user_data(request: Request):
     :param request:
     :return:
     """
-    return request.ctx.auth_user
+    return request.ctx.auth_user.to_dict()
 
 
 @admin_user_bp.get('/role/list')
@@ -105,3 +105,17 @@ async def admin_menu_del(request: Request, menu_id):
     :return:
     """
     await menu_service.del_menu(request, menu_id)
+
+
+@admin_user_bp.post('/menu/modify')
+@JwtExt.login_required()
+@request_log
+@ResponseBody()
+async def admin_menu_modify(request: Request):
+    """
+    新增菜单
+    :param request:
+    :return:
+    """
+    menu_form = MenuForm.from_json(request.json)
+    await menu_service.upd_menu(request, menu_form.data)

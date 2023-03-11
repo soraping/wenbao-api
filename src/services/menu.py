@@ -25,6 +25,20 @@ async def add_menu(request: Request, data):
     )
 
 
+async def upd_menu(request: Request, data):
+    """
+    更新菜单
+    :param request:
+    :param data:
+    :return:
+    """
+    if data['id'] is None:
+        raise exceptions.UserClientError("更新菜单必须选中一个菜单才能操作")
+    await request.ctx.db.execute(
+        MenuModel.update(**data).where(MenuModel.id == data['id'])
+    )
+
+
 async def del_menu(request: Request, menu_id: str):
     """
     删除菜单
@@ -35,10 +49,19 @@ async def del_menu(request: Request, menu_id: str):
     menu = await query_menu_by_id(request, menu_id=menu_id)
     # 1. 是否有权限
     allow_permission = menu.permission
-    user_permissions = request.ctx.auth_user['permissions']
-    if allow_permission and allow_permission not in user_permissions:
+    user_permissions = request.ctx.auth_user.permissions
+    if allow_permission and allow_permission not in [permission['value'] for permission in user_permissions]:
         raise exceptions.UserHasNoPermissionRequest()
     # 2. 是否有子菜单，没有则可删除
+    child_menu = await request.ctx.db.scalar(
+        MenuModel.select(MenuModel.name).where(MenuModel.parent == menu_id)
+    )
+    if child_menu is not None:
+        raise exceptions.UserClientError(f"ID={menu_id}菜单有子菜单，不能删除")
+
+    del_num = await request.ctx.db.execute(
+        MenuModel.delete().where(MenuModel.id == menu_id)
+    )
 
 
 async def query_menu_by_id(request: Request, menu_id: str):
@@ -93,7 +116,7 @@ async def query_user_menu_list(request: Request):
     :return:
     """
     auth_user = request.ctx.auth_user
-    user_permissions = [permission['value'] for permission in auth_user['permissions']]
+    user_permissions = [permission['value'] for permission in auth_user.permissions]
     all_menu_list = await query_all_menu_list(request)
     # 根据权限筛选菜单
     return [menu for menu in all_menu_list if

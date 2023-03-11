@@ -35,7 +35,7 @@ class RoleScopesRequestError(exceptions.SanicException):
     """
     角色权限
     """
-    status_code = 401
+    status_code = 403
     message = "user role can not request"
 
 
@@ -43,7 +43,7 @@ class UserHasNoPermissionRequest(exceptions.SanicException):
     """
     权限不够
     """
-    status_code = 401
+    status_code = 403
     message = "user has not permission to request"
 
 
@@ -59,7 +59,7 @@ class UserClientError(exceptions.SanicException):
     """
     客户端请求错误
     """
-    status_code = 401
+    status_code = 403
 
 
 class ModelDoesNotExist(exceptions.SanicException):
