@@ -39,6 +39,14 @@ class RoleScopesRequestError(exceptions.SanicException):
     message = "user role can not request"
 
 
+class UserHasNoPermissionRequest(exceptions.SanicException):
+    """
+    权限不够
+    """
+    status_code = 401
+    message = "user has not permission to request"
+
+
 class MysqlConnectionError(exceptions.SanicException):
     """
     数据库连接失败
@@ -52,6 +60,13 @@ class UserClientError(exceptions.SanicException):
     客户端请求错误
     """
     status_code = 401
+
+
+class ModelDoesNotExist(exceptions.SanicException):
+    """
+    查无此人
+    """
+    status_code = 403
 
 
 class InitErrorHandler:

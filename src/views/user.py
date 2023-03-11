@@ -1,6 +1,9 @@
 from sanic import Blueprint
 from src.extension.jwt_ext import JwtExt
-from src.services import users_service
+from src.services import (
+    user as user_service,
+    menu as menu_service
+)
 from src.utils import request_log, ResponseBody
 from src.config.context import Request
 from src.forms import UserForm, MenuForm
@@ -19,7 +22,7 @@ async def user_login(request: Request):
     """
     user_login_form = UserForm.from_json(formdata=request.json)
     body = user_login_form.data
-    user_data = await users_service.query_user_by_login(request, body)
+    user_data = await user_service.query_user_by_login(request, body)
     token = JwtExt.create_access_token(user_data['id'], {'user_id': user_data['id']})
     user_data['token'] = token
     return user_data
@@ -48,7 +51,7 @@ async def admin_role_list(request: Request):
     :param request:
     :return:
     """
-    return await users_service.query_user_role_list(request)
+    return await user_service.query_user_role_list(request)
 
 
 @admin_user_bp.get('/owner/menu/list')
@@ -61,7 +64,7 @@ async def user_menu_list(request: Request):
     :param request:
     :return:
     """
-    return await users_service.query_user_menu_list(request)
+    return await menu_service.query_user_menu_list(request)
 
 
 @admin_user_bp.get('/all/menu/list')
@@ -74,7 +77,7 @@ async def admin_all_menu_list(request: Request):
     :param request:
     :return:
     """
-    return await users_service.query_all_menu_list(request)
+    return await menu_service.query_all_menu_list(request)
 
 
 @admin_user_bp.post('/menu/add')
@@ -88,4 +91,17 @@ async def admin_menu_add(request: Request):
     :return:
     """
     menu_form = MenuForm.from_json(request.json)
-    await users_service.add_menu(request, menu_form.data)
+    await menu_service.add_menu(request, menu_form.data)
+
+
+@admin_user_bp.delete('/menu/del/<menu_id>')
+@JwtExt.login_required()
+@request_log
+@ResponseBody()
+async def admin_menu_del(request: Request, menu_id):
+    """
+    新增菜单
+    :param request:
+    :return:
+    """
+    await menu_service.del_menu(request, menu_id)

@@ -7,7 +7,7 @@ from sanic import Sanic
 import jwt
 from src.utils import custom_exceptions
 from src.config.context import Request
-from src.services import users_service
+from src.services import user
 
 
 @dataclass
@@ -83,7 +83,7 @@ class JwtExt:
                 # todo 设置redis 缓存保存用户信息
                 user_id = resolve_token_data['user_id']
                 cache_key = f"USER_KEY_ID_{user_id}"
-                auth_user_info = await users_service.query_user_by_id(request, user_id)
+                auth_user_info = await user.query_user_by_id(request, user_id)
                 request.ctx.auth_user = auth_user_info
                 response = await func(request, *args, **kwargs)
                 return response
