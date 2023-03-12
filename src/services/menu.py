@@ -51,7 +51,7 @@ async def del_menu(request: Request, menu_id: str):
     allow_permission = menu.permission
     user_permissions = request.ctx.auth_user.permissions
     if allow_permission and allow_permission not in [permission['value'] for permission in user_permissions]:
-        raise exceptions.UserHasNoPermissionRequest()
+        raise exceptions.UserHasNoPermissionRequest(message="没有权限删除菜单")
     # 2. 是否有子菜单，没有则可删除
     child_menu = await request.ctx.db.scalar(
         MenuModel.select(MenuModel.name).where(MenuModel.parent == menu_id)
