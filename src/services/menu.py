@@ -9,8 +9,8 @@
 from typing import List
 from peewee import DoesNotExist
 from src.models import MenuModel
-from src.config.context import Request
-from src.utils import exceptions
+from src.core.context import Request
+from src.core import exceptions
 
 
 async def add_menu(request: Request, data):

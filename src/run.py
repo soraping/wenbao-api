@@ -4,11 +4,10 @@ from sanic.log import logger
 from sanic_ext import Extend
 
 from src.config import CONFIG
-from src.config.context import MyContent, Request
-from src.utils import custom_exceptions
+from src.core.context import MyContent, Request
+from src.core.exceptions import InitErrorHandler
 from src.extension.jwt_ext import JwtExt
 from src.extension.db import InitMysql
-from src.extension.aio_redis import RedisSession
 from src.views import bg_group
 
 # 配置信息
@@ -44,7 +43,7 @@ async def setup(app: Sanic, loop) -> None:
     logger.info(f"启动核心 => {app.config['WORKERS']}")
 
     # 异常处理
-    custom_exceptions.InitErrorHandler.initialize(app)
+    InitErrorHandler.initialize(app)
 
     # # 注册 redis
     # redis_pool = RedisSession.get_redis_pool(app.config['redis'])

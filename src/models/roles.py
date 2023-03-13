@@ -29,7 +29,7 @@ class RoleTypeEnum(Enum):
 
 
 class RoleModel(BaseModel):
-    name = CharField(max_length=20, verbose_name='role name')
+    name = CharField(max_length=20, unique=True, verbose_name='role name', help_text="角色名称")
     type = CharField(max_length=20, verbose_name='role type')
     desc = CharField(max_length=200, null=True, verbose_name='role desc')
     is_default = IntegerField(choices=((0, '不是'), (1, '是')), verbose_name='is default role', default=0)

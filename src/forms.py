@@ -29,11 +29,17 @@ class SanicForm(_SanicForm):
 
 
 class UserForm(SanicForm):
+    """
+    登录
+    """
     username = StringField('username', validators=[DataRequired()])
     password = StringField('password', validators=[DataRequired()])
 
 
 class MenuForm(SanicForm):
+    """
+    菜单
+    """
     id = IntegerField('id')
     name = StringField('name', validators=[DataRequired()])
     icon = StringField('icon')
@@ -44,6 +50,16 @@ class MenuForm(SanicForm):
     permission = StringField('permission')
     parent = IntegerField('parent')
     key = StringField('key')
+
+
+class RoleForm(SanicForm):
+    """
+    角色
+    """
+    id = IntegerField('id')
+    name = StringField('name', validators=[DataRequired()])
+    type = StringField('type', validators=[DataRequired()])
+    is_default = IntegerField('is_default')
 
 
 if __name__ == '__main__':

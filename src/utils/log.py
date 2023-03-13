@@ -1,9 +1,8 @@
-from typing import Dict, AnyStr
 import orjson
 from functools import wraps, singledispatch
 from sanic import HTTPResponse
 from sanic.log import logger
-from src.config.context import Request
+from src.core.context import Request
 
 
 @singledispatch

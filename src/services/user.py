@@ -6,8 +6,9 @@ from src.models import (
     UserRoleModel,
     RolePermissionModel
 )
-from src.config.context import Request
-from src.utils import exceptions, gen_password
+from src.core.context import Request
+from src.utils import gen_password
+from src.core import exceptions
 
 
 async def query_user_by_login(request: Request, data):
@@ -137,13 +138,28 @@ async def query_user_permissions_by_role(request: Request, role_ids):
     ]
 
 
-
-
-
 async def query_user_role_list(request: Request):
     """
     查询角色列表
     :param request:
     :return:
     """
-    ...
+    role_models: List[RoleModel] = await request.ctx.db.execute(
+        RoleModel.select()
+    )
+    data_list = [
+        role.model_to_dict(exclude=[RoleModel.update_time, RoleModel.status])
+        for role in role_models
+    ]
+
+
+async def add_user_role(request: Request, role):
+    """
+    新增角色
+    :param request:
+    :param role:
+    :return:
+    """
+    await request.ctx.db.execute(
+        RoleModel.insert(**role)
+    )

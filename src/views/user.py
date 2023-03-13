@@ -5,8 +5,8 @@ from src.services import (
     menu as menu_service
 )
 from src.utils import request_log, ResponseBody
-from src.config.context import Request
-from src.forms import UserForm, MenuForm
+from src.core.context import Request
+from src.forms import UserForm, MenuForm, RoleForm
 
 admin_user_bp = Blueprint('admin-user', url_prefix='/admin/user')
 user_bp = Blueprint('user', url_prefix='/user')
@@ -52,6 +52,20 @@ async def admin_role_list(request: Request):
     :return:
     """
     return await user_service.query_user_role_list(request)
+
+
+@admin_user_bp.post('/role/add')
+@JwtExt.login_required()
+@request_log
+@ResponseBody()
+async def admin_role_add(request: Request):
+    """
+    角色列表
+    :param request:
+    :return:
+    """
+    role_form = RoleForm.from_json(request.json)
+    await user_service.add_user_role(request, role_form.data)
 
 
 @admin_user_bp.get('/owner/menu/list')

@@ -5,8 +5,8 @@ from contextlib import contextmanager
 from functools import wraps
 from sanic import Sanic
 import jwt
-from src.utils import custom_exceptions
-from src.config.context import Request, AuthUser
+from src.core import exceptions as custom_exceptions
+from src.core.context import Request, AuthUser
 from src.services import user
 
 
