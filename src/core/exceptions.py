@@ -12,7 +12,8 @@ class ConfigurationConflictError(exceptions.SanicException):
 
 
 class JWTTokenDecodeError(exceptions.SanicException):
-    message = "An error decoding a JWT"
+    status_code = 400
+    message = "jwt-token 过期或解析失败"
 
 
 class InvalidJWTTokenError(exceptions.SanicException):
@@ -78,6 +79,7 @@ class InitErrorHandler:
     def initialize(cls, app: Sanic):
         app.error_handler.add(exceptions.ServerError, cls._handler(exceptions.ServerError.status_code))
         app.error_handler.add(exceptions.NotFound, cls._handler(exceptions.NotFound.status_code))
+        app.error_handler.add(JWTTokenDecodeError, cls._handler(10042))
 
     @classmethod
     def _handler(cls, code):

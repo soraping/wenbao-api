@@ -1,3 +1,4 @@
+import time
 import orjson
 from functools import wraps, singledispatch
 from sanic import HTTPResponse
@@ -30,9 +31,12 @@ def _(data):
 def request_log(func):
     @wraps(func)
     async def decorator(request: Request, *args, **kwargs):
+        # start time
+        t = time.perf_counter()
         # 请求日志打印
         request_id = str(request.id)
-        logger.info(f"request_id={request_id}\trequest_url={request.uri_template}")
+        LOG_PRE = f"\nrequest_id={request_id}"
+        logger.info(f"{LOG_PRE}\trequest_url={request.uri_template}")
         login_user = request.ctx.auth_user
         log_data = {
             'request_id': request_id,
@@ -51,11 +55,14 @@ def request_log(func):
             log_data['login_user'] = login_user.to_dict()
 
         # json.dumps(request_data, indent=4) 美化输出
-        logger.info(f"\nrequest_id={request_id}\nrequest_log={json_prettify(log_data)}")
+        logger.info(f"{LOG_PRE}\nrequest_log={json_prettify(log_data)}")
         func_data = await func(request, *args, **kwargs)
         # 做个返回值保护
         result_data = func_data.body if isinstance(func_data, HTTPResponse) else func_data
-        logger.info(f"\nrequest_id={request_id}\nresponse_log={json_prettify(result_data)}")
+        logger.info(f"{LOG_PRE}\nresponse_log={json_prettify(result_data)}")
+
+        # 新增消耗时间
+        logger.info(f"{LOG_PRE} cost_time={(time.perf_counter() - t) * 1000:.2f}ms")
         return func_data
 
     return decorator

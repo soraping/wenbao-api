@@ -6,28 +6,21 @@
 # @Author  : caoping
 # @desc    : 分页
 from typing import List
+from .base import BaseBean
 
 
-class Page:
+class PageListResponse(BaseBean):
+
     dataList: List
     pageNo: int
     pageSize: int
     pageTotal: int
 
-
-class PageListResponse:
-
-    def __init__(self, dataList: List = [], pageNo: int = 0, pageSize: int = 10, pageTotal: int = 0):
-        self.dataList = dataList
-        self.pageNo = pageNo
-        self.pageSize = pageSize
-        self.pageTotal = pageTotal
-
     @classmethod
-    def to_dict(cls, data: Page):
-        return cls(
-            dataList=data.dataList,
-            pageNo=data.pageNo,
-            pageSize=data.pageSize,
-            pageTotal=data.pageTotal
-        )
+    def result(cls, dataList: List = [], pageNo: int = 0, pageSize: int = 10, pageTotal: int = 0):
+        cls.dataList = dataList
+        cls.pageTotal = pageTotal
+        cls.pageNo = pageNo
+        cls.pageSize = pageSize
+        return cls().to_dict()
+

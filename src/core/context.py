@@ -3,6 +3,7 @@ import types
 from dataclasses import dataclass
 from peewee_async import Manager
 from sanic import Request as SanicRequest
+from .base import BaseBean
 
 
 # @dataclass
@@ -25,7 +26,7 @@ class Permissions:
     value: str
 
 
-class AuthUser:
+class AuthUser(BaseBean):
     user_id: str
     user_id: int
     token: str
@@ -45,25 +46,6 @@ class AuthUser:
         cls.roles = auth_user.get('roles')
         cls.permissions = auth_user.get('permissions')
         return cls()
-
-    def __iter__(self):
-        """
-        可迭代
-        :return:
-        """
-        return (key for key in dir(self) if not key.startswith('__'))
-
-    def to_dict(self):
-        """
-        类属性转dict
-        :return:
-        """
-        result_dict = {
-            key: getattr(self, key)
-            for key in self
-            if type(getattr(self, key)) is not types.MethodType
-        }
-        return result_dict
 
 
 class MyContent:

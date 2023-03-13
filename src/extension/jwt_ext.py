@@ -63,7 +63,8 @@ class JwtExt:
                 algorithms=[cls.config.algorithm]
             )
             return jwt_data['data']
-        except jwt.exceptions.DecodeError:
+        except (jwt.exceptions.DecodeError, jwt.exceptions.ExpiredSignatureError):
+            # 过期和解析失败都抛出异常
             raise custom_exceptions.JWTTokenDecodeError
 
     @classmethod

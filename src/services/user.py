@@ -4,11 +4,13 @@ from src.models import (
     UserModel,
     RoleModel,
     UserRoleModel,
-    RolePermissionModel
+    RolePermissionModel,
+    PermissionModel
 )
 from src.core.context import Request
 from src.utils import gen_password
 from src.core import exceptions
+from src.core.page import PageListResponse
 
 
 async def query_user_by_login(request: Request, data):
@@ -144,13 +146,17 @@ async def query_user_role_list(request: Request):
     :param request:
     :return:
     """
+    # 获取列表查询参数
+
     role_models: List[RoleModel] = await request.ctx.db.execute(
-        RoleModel.select()
+        RoleModel.select().where(RoleModel.status == 1)
     )
     data_list = [
         role.model_to_dict(exclude=[RoleModel.update_time, RoleModel.status])
         for role in role_models
     ]
+
+    return PageListResponse.result(dataList=data_list, pageNo=1, pageSize=10, pageTotal=56)
 
 
 async def add_user_role(request: Request, role):
@@ -163,3 +169,33 @@ async def add_user_role(request: Request, role):
     await request.ctx.db.execute(
         RoleModel.insert(**role)
     )
+
+
+async def upd_user_role(request: Request, role):
+    """
+    更新角色
+    :param request:
+    :param role:
+    :return:
+    """
+    if role['id']:
+        raise exceptions.UserClientError("更新角色必须选中一个角色才能操作")
+    await request.ctx.db.execute(
+        RoleModel.update(**role).where(RoleModel.id == role['id'])
+    )
+
+
+async def query_permission_list(request: Request):
+    """
+    查询权限列表
+    :param request:
+    :return:
+    """
+    permissions_models: List[PermissionModel] = await request.ctx.db.execute(
+        PermissionModel.select()
+    )
+
+    return [
+        permission.model_to_dict(exclude=PermissionModel.update_time)
+        for permission in permissions_models
+    ]
