@@ -1,7 +1,9 @@
 from sanic import Sanic, exceptions, Request
+from sanic.handlers import ErrorHandler
 from sanic.log import logger
 from sanic.response import json
 from src.constant import ResponseTypeEnum
+import pymysql
 
 
 class ConfigurationConflictError(exceptions.SanicException):
@@ -70,6 +72,12 @@ class ModelDoesNotExist(exceptions.SanicException):
     status_code = 400
 
 
+class CustomErrorHandler(ErrorHandler):
+    def default(self, request, exception):
+        return super().default(request, exception)
+        # return json({'message': str(exception), 'code': self.code, "type": ResponseTypeEnum.ERROR.value})
+
+
 class InitErrorHandler:
 
     def __init__(self, code):
@@ -80,6 +88,8 @@ class InitErrorHandler:
         app.error_handler.add(exceptions.ServerError, cls._handler(exceptions.ServerError.status_code))
         app.error_handler.add(exceptions.NotFound, cls._handler(exceptions.NotFound.status_code))
         app.error_handler.add(JWTTokenDecodeError, cls._handler(10042))
+        app.error_handler.add(pymysql.err.OperationalError, cls._handler(-1))
+        # app.error_handler = CustomErrorHandler()
 
     @classmethod
     def _handler(cls, code):

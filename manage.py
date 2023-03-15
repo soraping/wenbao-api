@@ -44,13 +44,13 @@ def log(msg, mode='info'):
 
 
 async def run():
-    # log("开始安装...", mode='start')
-    # await create_table()
-    # await permissions()
-    # await role()
-    # admin_user_id = await admin()
-    # log(f"管理员账号 => {admin_user_id}")
-    # await relation(admin_user_id)
+    log("开始安装...", mode='start')
+    await create_table()
+    await permissions()
+    await role()
+    admin_user_id = await admin()
+    log(f"管理员账号 => {admin_user_id}")
+    await relation(admin_user_id)
     await init_menu()
     await mgr.close()
     log("安装完成", mode='done')
@@ -74,23 +74,28 @@ async def permissions():
     permissions = [
         {
             'label': '主控台',
-            'value': 'dashboard_console',
+            'key': 'dashboard_console',
+            'value': 'dashboard_console'
         },
         {
             'label': '监控页',
-            'value': 'dashboard_monitor',
+            'key': 'dashboard_monitor',
+            'value': 'dashboard_monitor'
         },
         {
             'label': '工作台',
-            'value': 'dashboard_workplace',
+            'key': 'dashboard_workplace',
+            'value': 'dashboard_workplace'
         },
         {
             'label': '基础列表',
-            'value': 'basic_list',
+            'key': 'basic_list',
+            'value': 'basic_list'
         },
         {
             'label': '基础列表删除',
-            'value': 'basic_list_delete',
+            'key': 'basic_list_delete',
+            'value': 'basic_list_delete'
         },
     ]
 
@@ -149,7 +154,7 @@ async def relation(admin_user_id):
     admin_role = [role for role in roles if role.model_to_dict()['type'] == RoleTypeEnum.ADMIN.value][0]
     # 权限
     permission_models = await mgr.execute(
-        PermissionModel.select(PermissionModel.id, PermissionModel.value)
+        PermissionModel.select(PermissionModel.id, PermissionModel.key)
     )
     permissions = list(permission_models)
 
@@ -188,7 +193,8 @@ async def init_menu():
             "component": "LAYOUT",
             "path": "dashboard",
             "permission": "dashboard_workplace",
-            "type": 1
+            "type": 1,
+            "redirect": '/dashboard/console'
         },
         {
             "id": 2,
@@ -198,7 +204,8 @@ async def init_menu():
             "component": "LAYOUT",
             "path": "system",
             "permission": "dashboard_workplace",
-            "type": 1
+            "type": 1,
+            "redirect": '/system/menu'
         },
         {
             "id": 3,
@@ -212,13 +219,25 @@ async def init_menu():
         },
         {
             "id": 4,
-            "name": "菜单权限",
+            "name": "菜单管理",
             "key": "system_menu",
             "parent": 2,
             "component": "/system/menu/menu",
             "path": "menu",
             "permission": "dashboard_workplace",
             "type": 1
+        },
+        {
+            {
+                "id": 5,
+                "name": "角色管理",
+                "key": "system_role",
+                "parent": 2,
+                "component": "/system/role/role",
+                "path": "role",
+                "permission": "dashboard_workplace",
+                "type": 1
+            },
         }
     ]
     await mgr.execute(

@@ -9,7 +9,7 @@ from typing import Callable, Dict
 from sanic_wtf import SanicForm as _SanicForm
 from wtforms import (
     BooleanField, PasswordField, SelectField,
-    SelectMultipleField, StringField, SubmitField, TextAreaField, IntegerField
+    SelectMultipleField, StringField, SubmitField, TextAreaField, IntegerField, FieldList
 )
 from wtforms.validators import DataRequired
 from wtforms.form import Form
@@ -50,6 +50,7 @@ class MenuForm(SanicForm):
     permission = StringField('permission')
     parent = IntegerField('parent')
     key = StringField('key')
+    hidden = IntegerField('hidden')
 
 
 class RoleForm(SanicForm):
@@ -60,6 +61,14 @@ class RoleForm(SanicForm):
     name = StringField('name', validators=[DataRequired()])
     type = StringField('type', validators=[DataRequired()])
     is_default = IntegerField('is_default')
+
+
+class RolePermissionForm(SanicForm):
+    """
+    角色&权限关系
+    """
+    role_id = IntegerField('role_id', validators=[DataRequired()])
+    ids = FieldList(StringField('ids'))
 
 
 if __name__ == '__main__':

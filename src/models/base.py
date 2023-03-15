@@ -20,13 +20,13 @@ class BaseModel(Model):
     update_time = DateTimeField(default=datetime.datetime.utcnow, formats='%Y-%m-%d %H:%M:%S',
                                 verbose_name='modify time')
 
-    def model_to_dict(self, exclude=None) -> ModelDictType:
+    def model_to_dict(self, exclude=None, only=None) -> ModelDictType:
         """
         model 转 dict
         能递归，更方面
         :return:
         """
-        return model_to_dict(self, exclude=exclude)
+        return model_to_dict(self, exclude=exclude, only=only)
 
     # def to_dict(self) -> Dict[str, Union[datetime.datetime, int, str]]:
     #     """

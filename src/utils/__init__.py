@@ -4,6 +4,7 @@ import importlib
 from typing import AnyStr, Generator
 from src.core.decorators import singleton, ResponseBody
 from .log import request_log
+from .cache import async_cache
 
 
 def auto_load_gen(path: str) -> Generator:
@@ -61,7 +62,6 @@ def gen_password(password: AnyStr, salt: AnyStr):
     return md5(salt.join(password))
 
 
-
 __all__ = [
     'singleton',
     'gen_random',
@@ -69,5 +69,6 @@ __all__ = [
     'gen_password',
     'auto_load_gen',
     'request_log',
-    'ResponseBody'
+    'ResponseBody',
+    'async_cache'
 ]

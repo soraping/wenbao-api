@@ -1,5 +1,6 @@
 from typing import List
 from peewee import DoesNotExist, JOIN
+from sanic.log import logger
 from src.models import (
     UserModel,
     RoleModel,
@@ -132,7 +133,9 @@ async def query_user_permissions_by_role(request: Request, role_ids):
 
     return [
         {
+            "id": permission.permission.id,
             "label": permission.permission.label,
+            "key": permission.permission.key,
             "value": permission.permission.value
         }
         for permission in role_permissions
@@ -147,16 +150,27 @@ async def query_user_role_list(request: Request):
     :return:
     """
     # 获取列表查询参数
+    pageNo = 1
+    pageSize = 10
+
+    # 总数
+    pageTotal = await request.ctx.db.count(
+        RoleModel.select(RoleModel.name)
+            .where(RoleModel.status == 1)
+    )
 
     role_models: List[RoleModel] = await request.ctx.db.execute(
-        RoleModel.select().where(RoleModel.status == 1)
+        RoleModel
+            .select()
+            .where(RoleModel.status == 1)
+            .paginate(pageNo, pageSize)
     )
     data_list = [
         role.model_to_dict(exclude=[RoleModel.update_time, RoleModel.status])
         for role in role_models
     ]
 
-    return PageListResponse.result(dataList=data_list, pageNo=1, pageSize=10, pageTotal=56)
+    return PageListResponse.result(dataList=data_list, pageNo=pageNo, pageSize=pageSize, pageTotal=pageTotal)
 
 
 async def add_user_role(request: Request, role):
@@ -192,10 +206,66 @@ async def query_permission_list(request: Request):
     :return:
     """
     permissions_models: List[PermissionModel] = await request.ctx.db.execute(
-        PermissionModel.select()
+        PermissionModel.select(PermissionModel.id, PermissionModel.label, PermissionModel.value, PermissionModel.key)
     )
 
     return [
-        permission.model_to_dict(exclude=PermissionModel.update_time)
+        permission.model_to_dict(only=[
+            PermissionModel.id,
+            PermissionModel.label,
+            PermissionModel.value,
+            PermissionModel.key])
         for permission in permissions_models
     ]
+
+
+async def role_permission_add(request: Request, role_id):
+    ...
+
+
+async def modify_permission_by_role(request: Request, data):
+    """
+    修改某个角色的权限
+    :param request:
+    :param data:
+    :return:
+    """
+    select_permission_ids = set([int(i) for i in data['ids']])
+
+    # 当前修改的角色
+    role_id = data['role_id']
+
+    # 查询之前的分配权限
+    role_permissions = await query_user_permissions_by_role(request, [role_id])
+    old_permission_ids = set([
+        permission['id']
+        for permission in role_permissions
+    ])
+
+    """
+    核心逻辑，巧用集合的运算
+    """
+    # 先求交集
+    mixed_set = select_permission_ids & old_permission_ids
+
+    # 需要新增集合
+    add_permissions_set = select_permission_ids - mixed_set
+    # 需要删除集合
+    del_permissions = old_permission_ids - mixed_set
+
+    if len(add_permissions_set) > 0:
+        await request.ctx.db.execute(
+            RolePermissionModel.insert_many([
+                dict(role_id=role_id, permission_id=permission_id)
+                for permission_id in add_permissions_set
+            ])
+        )
+
+    if len(del_permissions) > 0:
+        await request.ctx.db.execute(
+            RolePermissionModel
+                .delete()
+                .where(RolePermissionModel.role == role_id and RolePermissionModel.permission.in_(del_permissions))
+        )
+
+    logger.info(f"切换角色 {role_id} 的权限为 {str(select_permission_ids)}")

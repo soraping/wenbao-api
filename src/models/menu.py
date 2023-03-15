@@ -31,12 +31,14 @@ class MenuModel(BaseModel):
     permission = CharField(max_length=20, verbose_name='menu auth', null=True)
     # 路由路径
     path = CharField(null=True, max_length=100, verbose_name='menu path', help_text="路由地址")
-    # 重定向地址
+    # 重定向地址, 只有父菜单适用
     redirect = CharField(null=True, max_length=128, verbose_name="重定向地址", help_text="重定向地址")
     # 对应前端模块名路径 /dashboard/console/console
     component = CharField(null=True, max_length=100, verbose_name='view component')
     # 排序
     sort = IntegerField(null=True, verbose_name="排序", default=0)
+    # 是否在菜单栏展示, 只对主菜单生效
+    hidden = IntegerField(null=True, choices=((0, '展示'), (1, '隐藏')), verbose_name="是否展示")
 
     class Meta:
         table_name = 'menu'
