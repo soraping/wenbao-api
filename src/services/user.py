@@ -9,7 +9,7 @@ from src.models import (
     PermissionModel
 )
 from src.core.context import Request
-from src.utils import gen_password
+from src.utils import gen_password, url_query_to_dict
 from src.core import exceptions
 from src.core.page import PageListResponse
 
@@ -150,27 +150,37 @@ async def query_user_role_list(request: Request):
     :return:
     """
     # 获取列表查询参数
-    pageNo = 1
-    pageSize = 10
+    query_dict = url_query_to_dict(request.query_string)
+    page_no = int(query_dict['pageNo'] if query_dict['pageNo'] else 1)
+    page_size = int(query_dict['pageSize'] if query_dict['pageSize'] else 10)
 
     # 总数
-    pageTotal = await request.ctx.db.count(
+    page_total = await request.ctx.db.count(
         RoleModel.select(RoleModel.name)
             .where(RoleModel.status == 1)
     )
+
+    # 总页数
+    page_count = int((page_total + page_size - 1) / page_size)
 
     role_models: List[RoleModel] = await request.ctx.db.execute(
         RoleModel
             .select()
             .where(RoleModel.status == 1)
-            .paginate(pageNo, pageSize)
+            .paginate(page_no, page_size)
     )
     data_list = [
         role.model_to_dict(exclude=[RoleModel.update_time, RoleModel.status])
         for role in role_models
     ]
 
-    return PageListResponse.result(dataList=data_list, pageNo=pageNo, pageSize=pageSize, pageTotal=pageTotal)
+    return PageListResponse.result(
+        dataList=data_list,
+        pageNo=page_no,
+        pageSize=page_size,
+        pageCount=page_count,
+        total=page_total
+    )
 
 
 async def add_user_role(request: Request, role):
@@ -180,6 +190,14 @@ async def add_user_role(request: Request, role):
     :param role:
     :return:
     """
+    # 查询角色数量
+    role_total = await request.ctx.db.count(
+        RoleModel.select(RoleModel.id).where(RoleModel.status == 1)
+    )
+
+    if role_total > 20:
+        raise exceptions.UserClientError(message="角色数量超过最大限制")
+
     await request.ctx.db.execute(
         RoleModel.insert(**role)
     )
@@ -196,6 +214,18 @@ async def upd_user_role(request: Request, role):
         raise exceptions.UserClientError("更新角色必须选中一个角色才能操作")
     await request.ctx.db.execute(
         RoleModel.update(**role).where(RoleModel.id == role['id'])
+    )
+
+
+async def del_user_role(request: Request, role_id):
+    """
+    删除角色
+    :param request:
+    :param role_id:
+    :return:
+    """
+    await request.ctx.db.execute(
+        RoleModel.delete().where(RoleModel.id == role_id)
     )
 
 
@@ -217,10 +247,6 @@ async def query_permission_list(request: Request):
             PermissionModel.key])
         for permission in permissions_models
     ]
-
-
-async def role_permission_add(request: Request, role_id):
-    ...
 
 
 async def modify_permission_by_role(request: Request, data):

@@ -100,13 +100,26 @@ async def admin_role_add(request: Request):
     await user_service.add_user_role(request, role_form.data)
 
 
+@admin_user_bp.delete('/role/del/<role_id>')
+@JwtExt.login_required()
+@request_log
+@ResponseBody()
+async def admin_menu_del(request: Request, role_id):
+    """
+    新增菜单
+    :param request:
+    :return:
+    """
+    await user_service.del_user_role(request, role_id)
+
+
 @admin_user_bp.get('/owner/menu/list')
 @JwtExt.login_required()
 @request_log
 @ResponseBody()
 async def user_menu_list(request: Request):
     """
-    获取用户分配的菜单
+    根据当前登录用户权限获取用户分配的菜单
     :param request:
     :return:
     """

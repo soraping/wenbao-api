@@ -4,6 +4,7 @@ from sanic.log import logger
 from sanic.response import json
 from src.constant import ResponseTypeEnum
 import pymysql
+import peewee
 
 
 class ConfigurationConflictError(exceptions.SanicException):
@@ -89,6 +90,7 @@ class InitErrorHandler:
         app.error_handler.add(exceptions.NotFound, cls._handler(exceptions.NotFound.status_code))
         app.error_handler.add(JWTTokenDecodeError, cls._handler(10042))
         app.error_handler.add(pymysql.err.OperationalError, cls._handler(-1))
+        app.error_handler.add(peewee.IntegrityError, cls._handler(-1))
         # app.error_handler = CustomErrorHandler()
 
     @classmethod

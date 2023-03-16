@@ -17,7 +17,7 @@ class RolePermissionModel(BaseModel):
     """
     角色权限关系表
     """
-    role = ForeignKeyField(model=RoleModel, null=True, on_delete='SET NULL', verbose_name='role id')
+    role = ForeignKeyField(model=RoleModel, null=True, on_delete='CASCADE', verbose_name='role id')
     permission = ForeignKeyField(model=PermissionModel, null=True, on_delete='SET NULL', verbose_name='permission id')
 
     class Meta:

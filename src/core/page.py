@@ -11,16 +11,23 @@ from .base import BaseBean
 
 class PageListResponse(BaseBean):
 
+    # 列表数据
     dataList: List
+    # 页码数
     pageNo: int
+    # 一页数量
     pageSize: int
-    pageTotal: int
+    # 总页数
+    pageCount: int
+    # 总数
+    total: int
 
     @classmethod
-    def result(cls, dataList: List = [], pageNo: int = 0, pageSize: int = 10, pageTotal: int = 0):
+    def result(cls, dataList: List = [], pageNo: int = 0, pageSize: int = 10, pageCount: int = 0, total: int = 0):
         cls.dataList = dataList
-        cls.pageTotal = pageTotal
+        cls.pageCount = pageCount
         cls.pageNo = pageNo
         cls.pageSize = pageSize
+        cls.total = total
         return cls().to_dict()
 
