@@ -40,6 +40,67 @@ async def query_user_by_login(request: Request, data):
         raise exceptions.UserClientError(message="用户名或密码错误")
 
 
+async def query_user_list(request: Request):
+    """
+    会员列表
+    :param request:
+    :return:
+    """
+    # 获取列表查询参数
+    query_dict = url_query_to_dict(request.query_string)
+    page_no = int(query_dict.get('pageNo', 1))
+    page_size = int(query_dict.get('pageSize', 10))
+
+    mobile = query_dict.get('mobile')
+    username = query_dict.get('username')
+    card_id = query_dict.get('cardId')
+
+    # 查询
+    where_query = (UserModel.status != 0)
+    if mobile:
+        where_query = where_query & (UserModel.mobile == mobile)
+    if username:
+        where_query = where_query & (UserModel.mobile == username)
+    if card_id:
+        where_query = where_query & (UserModel.card_id == card_id)
+
+    # 总数
+    page_total = await request.ctx.db.count(
+        UserModel.select(UserModel.id).where(where_query)
+    )
+
+    # 总页数
+    page_count = int((page_total + page_size - 1) / page_size)
+
+    # 查询
+    user_list: List[UserModel] = await request.ctx.db.execute(
+        UserModel.select()
+            .where(where_query)
+            .paginate(page_no, page_size)
+    )
+
+    data_list = [
+        user.model_to_dict(only=[
+            UserModel.id,
+            UserModel.username,
+            UserModel.mobile,
+            UserModel.card_id,
+            UserModel.status,
+            UserModel.star,
+            UserModel.create_time
+        ])
+        for user in user_list
+    ]
+
+    return PageListResponse.result(
+        dataList=data_list,
+        pageSize=page_size,
+        pageNo=page_no,
+        pageCount=page_count,
+        total=page_total
+    )
+
+
 async def query_user_by_id(request: Request, user_id: str):
     """
     根据Id查询用户信息
@@ -49,15 +110,14 @@ async def query_user_by_id(request: Request, user_id: str):
     """
     try:
         user_data = await request.ctx.db.get(
-            UserModel.select(
-                UserModel.username,
-                UserModel.id,
-                UserModel.age,
-                UserModel.status
-            ).where((UserModel.id == user_id))
+            UserModel.select().where((UserModel.id == user_id))
         )
 
-        auth_user_result_dict = user_data.model_to_dict()
+        auth_user_result_dict = user_data.model_to_dict(exclude=[
+            UserModel.password,
+            UserModel.salt,
+            UserModel.update_time
+        ])
         roles, permissions = await query_user_roles_and_permissions(request, auth_user_result_dict.get('id'))
         auth_user_result_dict['roles'] = roles
         # 获取权限
@@ -151,8 +211,8 @@ async def query_user_role_list(request: Request):
     """
     # 获取列表查询参数
     query_dict = url_query_to_dict(request.query_string)
-    page_no = int(query_dict['pageNo'] if query_dict['pageNo'] else 1)
-    page_size = int(query_dict['pageSize'] if query_dict['pageSize'] else 10)
+    page_no = int(query_dict.get('pageNo', 1))
+    page_size = int(query_dict.get('pageSize', 10))
 
     # 总数
     page_total = await request.ctx.db.count(

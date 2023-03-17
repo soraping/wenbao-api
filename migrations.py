@@ -147,6 +147,6 @@ class MigratorOperate:
 
 
 if __name__ == '__main__':
-    from src.models import MenuModel
-    # mr = MigratorOperate(MenuModel)
-    # mr.add_table_column('hidden')
+    from src.models import UserModel
+    # mr = MigratorOperate(UserModel)
+    # mr.add_table_column('card_id')

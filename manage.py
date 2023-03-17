@@ -135,6 +135,8 @@ async def admin():
     admin_data['salt'] = salt
     admin_data['password'] = gen_password(admin_data['password'], salt)
     admin_data['age'] = 10
+    admin_data['invite_owner_code'] = gen_random(mode='mixUpperDigit', length=6)
+    admin_data['card_id'] = '111111111111111111'
     rprint(admin_data)
     user_id = await mgr.execute(
         UserModel.insert(**admin_data)
@@ -228,16 +230,14 @@ async def init_menu():
             "type": 1
         },
         {
-            {
-                "id": 5,
-                "name": "角色管理",
-                "key": "system_role",
-                "parent": 2,
-                "component": "/system/role/role",
-                "path": "role",
-                "permission": "dashboard_workplace",
-                "type": 1
-            },
+            "id": 5,
+            "name": "角色管理",
+            "key": "system_role",
+            "parent": 2,
+            "component": "/system/role/role",
+            "path": "role",
+            "permission": "dashboard_workplace",
+            "type": 1
         }
     ]
     await mgr.execute(

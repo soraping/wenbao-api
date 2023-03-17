@@ -1,6 +1,7 @@
 import random
 import hashlib
 import importlib
+from uuid import uuid4
 from urllib.parse import parse_qsl
 from typing import AnyStr, Generator
 from src.core.decorators import singleton, ResponseBody
@@ -32,6 +33,7 @@ def gen_random(mode='mixDigitLetter', length=16):
         "digit": digits,
         "upper": upper_letter,
         "lower": lower_letter,
+        'mixUpperDigit': upper_letter + digits,
         "mixDigitLetter": upper_letter + lower_letter + digits,
         "mixLetter": upper_letter + lower_letter,
         "mixDigitLetterCharcter": upper_letter + lower_letter + digits + wpecial_characters
@@ -76,11 +78,29 @@ def url_query_to_dict(query_string: str):
     return dict(parse_qsl(query_string))
 
 
+def gen_uuid():
+    """
+    32位随机数
+    :return:
+    """
+    return ''.join(str(uuid4()).split('-'))
+
+
+def gen_spu_id():
+    """
+    spuid
+    :return:
+    """
+    return gen_random(mode='digit', length=6)
+
+
 __all__ = [
     'singleton',
     'gen_random',
     'md5',
     'gen_password',
+    'gen_uuid',
+    'gen_spu_id',
     'auto_load_gen',
     'request_log',
     'ResponseBody',

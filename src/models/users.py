@@ -23,6 +23,11 @@ class UserModel(BaseModel):
     avatar = CharField(null=True, max_length=100, verbose_name='user avatar')
     mobile = CharField(null=True, unique=True, max_length=20, verbose_name='user mobile')
     status = IntegerField(choices=((0, '删除'), (1, '正常'), (2, '锁定')), verbose_name='user status', default=1)
+    card_id = CharField(null=True, max_length=50, verbose_name='ID CARD', help_text='身份证', unique=True)
+    invite_owner_code = CharField(null=True, max_length=15, verbose_name='owner invite code', help_text='专属邀请码', unique=True)
+    inviter_user_id = CharField(null=True, max_length=15, verbose_name='inviter userId', help_text='邀请人ID')
+    star = IntegerField(null=True, verbose_name='member level', help_text='会员星级', default=0)
+
 
     class Meta:
         table_name = 'user'

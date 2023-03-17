@@ -43,7 +43,21 @@ async def admin_user_data(request: Request):
     :param request:
     :return:
     """
-    return request.ctx.auth_user.to_dict()
+    auth_user = request.ctx.auth_user
+    return await user_service.query_user_by_id(request, auth_user.user_id)
+
+
+@admin_user_bp.get('/member/list')
+@JwtExt.login_required()
+@request_log
+@ResponseBody()
+async def admin_member_list(request: Request):
+    """
+    会员列表
+    :param request:
+    :return:
+    """
+    return await user_service.query_user_list(request)
 
 
 @admin_user_bp.get('/detail/<user_id>')

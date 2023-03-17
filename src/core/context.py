@@ -28,7 +28,6 @@ class Permissions:
 
 class AuthUser(BaseBean):
     user_id: str
-    user_id: int
     token: str
     username: str
     age: int
