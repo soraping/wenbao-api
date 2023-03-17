@@ -71,5 +71,17 @@ class RolePermissionForm(SanicForm):
     ids = FieldList(StringField('ids'))
 
 
+class CategoryForm(SanicForm):
+    """
+    分类
+    """
+    name = StringField('name', validators=[DataRequired()])
+    parent = StringField('parent')
+    allow_level = StringField('star')
+    logo_url = StringField('logoUrl')
+    online_time = StringField('onlineTime')
+    sort = IntegerField('sort')
+
+
 if __name__ == '__main__':
     ...

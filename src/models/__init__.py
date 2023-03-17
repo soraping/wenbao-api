@@ -10,6 +10,7 @@ from .user_roles import UserRoleModel
 from .permissions import PermissionModel
 from .role_permissions import RolePermissionModel
 from .menu import MenuModel
+from .goods_category import GoodsCategoryModel
 
 
 __all__ = [
@@ -19,5 +20,6 @@ __all__ = [
     'RoleModel',
     'UserRoleModel',
     'MenuModel',
+    'GoodsCategoryModel',
     'RoleTypeEnum'
 ]
