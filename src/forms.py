@@ -71,6 +71,21 @@ class RolePermissionForm(SanicForm):
     ids = FieldList(StringField('ids'))
 
 
+class MemberForm(SanicForm):
+    """
+    会员
+    """
+    id = IntegerField('id')
+    username = StringField('username', validators=[DataRequired()])
+    mobile = StringField('mobile', validators=[DataRequired()])
+    password = StringField('password')
+    age = IntegerField('age')
+    avatar = StringField('avatar')
+    card_id = StringField('card_id')
+    inviter_user_id = StringField('inviter_user_id')
+    star = IntegerField('star')
+
+
 class CategoryForm(SanicForm):
     """
     分类

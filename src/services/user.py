@@ -9,7 +9,7 @@ from src.models import (
     PermissionModel
 )
 from src.core.context import Request
-from src.utils import gen_password, url_query_to_dict
+from src.utils import gen_password, url_query_to_dict, gen_random
 from src.core import exceptions
 from src.core.page import PageListResponse
 
@@ -60,7 +60,7 @@ async def query_user_list(request: Request):
     if mobile:
         where_query = where_query & (UserModel.mobile == mobile)
     if username:
-        where_query = where_query & (UserModel.mobile == username)
+        where_query = where_query & (UserModel.username == username)
     if card_id:
         where_query = where_query & (UserModel.card_id == card_id)
 
@@ -99,6 +99,74 @@ async def query_user_list(request: Request):
         pageCount=page_count,
         total=page_total
     )
+
+
+async def add_member_by_admin(request: Request, data):
+    """
+    管理员新增会员
+    :param request:
+    :param data:
+    :return:
+    """
+    # 设置默认密码
+    data['password'] = "111111"
+    await save_user(request, data)
+
+
+async def save_user(request: Request, user):
+    """
+    保存用户
+    :param request:
+    :param user:
+    :return:
+    """
+    await check_member_unique(request, user)
+
+    salt = gen_random(length=12)
+    user['salt'] = salt
+    user['password'] = gen_password(user['password'], salt)
+    user['invite_owner_code'] = gen_random(mode='mixUpperDigit', length=6)
+    user['status'] = 1
+
+    try:
+        await request.ctx.db.execute(
+            UserModel.insert(**user)
+        )
+    except exceptions.UserClientError:
+        raise exceptions.UserClientError(message="用户注册失败")
+
+
+async def modify_member(request: Request, user):
+    """
+    更新用户信息
+    :param request:
+    :param update_user:
+    :return:
+    """
+    user_id = user['id']
+    # 可更新字段
+    fields = ['age', 'avatar', 'star', 'status']
+    update_user = {
+        key: user[key]
+        for key in fields
+        if user.get(key)
+    }
+    try:
+        await request.ctx.db.execute(
+            UserModel.update(**update_user).where(UserModel.id == user_id)
+        )
+    except exceptions.UserClientError:
+        raise exceptions.UserClientError(message="用户信息操作失败")
+
+
+async def check_member_unique(request: Request, user):
+    # 检测手机号和用户名是否重复
+    users: List[UserModel] = await request.ctx.db.execute(
+        UserModel.select(UserModel.id)
+            .where((UserModel.username == user['username']) | (UserModel.mobile == user['mobile']))
+    )
+    if len(users) != 0:
+        raise exceptions.UserClientError(message="用户名或手机号重复")
 
 
 async def query_user_by_id(request: Request, user_id: str):

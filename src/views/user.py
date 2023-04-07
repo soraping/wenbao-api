@@ -10,7 +10,8 @@ from src.forms import (
     UserForm,
     MenuForm,
     RoleForm,
-    RolePermissionForm
+    RolePermissionForm,
+    MemberForm
 )
 
 admin_user_bp = Blueprint('admin-user', url_prefix='/admin/user')
@@ -58,6 +59,34 @@ async def admin_member_list(request: Request):
     :return:
     """
     return await user_service.query_user_list(request)
+
+
+@admin_user_bp.post('/member/add')
+@JwtExt.login_required()
+@request_log
+@ResponseBody()
+async def admin_member_add(request: Request):
+    """
+    管理员新增会员
+    :param request:
+    :return:
+    """
+    member_form = MemberForm.from_json(request.json)
+    await user_service.add_member_by_admin(request, member_form.data)
+
+
+@admin_user_bp.put('/member/modify/<user_id>/<status>')
+@JwtExt.login_required()
+@request_log
+@ResponseBody()
+async def admin_member_status(request: Request, user_id, status):
+    """
+    管理员更新会员状态
+    :param request:
+    :return:
+    """
+    data = dict(id=user_id, status=status)
+    return await user_service.modify_member(request, data)
 
 
 @admin_user_bp.get('/detail/<user_id>')
